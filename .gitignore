@@ -1,0 +1,27 @@
+# Node.js dependencies
+# Falls du 'npm install' (z.B. für TypeScript oder Obsidian API-Typen) ausführst
+/node_modules/
+
+# Obsidian Test Vault
+# Wenn du einen Obsidian-Vault *in* diesem Ordner erstellst, um das Plugin zu testen,
+# wird dieser ignoriert.
+/.obsidian/
+
+# Environment variables
+# Zum sicheren Speichern von API-Keys, falls du sie aus dem Code auslagerst
+.env
+.env.local
+*.env
+
+# IDE & Editor Config
+.vscode/
+.idea/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Log files
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
