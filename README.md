@@ -1,6 +1,6 @@
 # Note Illustrator for Obsidian
 
-This is a plugin for Obsidian.md designed to help Game Masters (GMs) and players automatically generate art for characters, locations, and items.
+This is a plugin for Obsidian.md designed to help you automatically generate art for your notes. It was originally built for TTRPG Game Masters (GMs) to create images for characters and locations, but it is universally applicable for any note.
 
 The plugin reads the text under a **user-defined heading** (e.g., `# Description`) in your active note, sends it to **OpenAI (DALL-E 3)**, and then automatically replaces a specified placeholder image in that note with the newly generated art.
 
