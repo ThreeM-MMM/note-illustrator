@@ -42,6 +42,7 @@ var DEFAULT_SETTINGS = {
   headingText: "Description",
   useSmartSizing: false,
   deleteOnRegenerate: false,
+  ttrpgVaultCompatibility: false,
 };
 
 // Confirmation Modal Class
@@ -310,6 +311,25 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin {
       const newContent = content.replace(targetRegex, newImageLink);
       await this.app.vault.modify(file, newContent);
 
+      // *** UPDATE FRONTMATTER ***
+      if (this.settings.ttrpgVaultCompatibility) {
+        let keyUpdated = false;
+        await this.app.fileManager.processFrontMatter(file, (fm) => {
+          // *** CHANGE HERE: Use fileName instead of filePath ***
+          if (fm["Image"]) {
+            fm["Image"] = fileName;
+            keyUpdated = true;
+          } else if (fm["image"]) {
+            fm["image"] = fileName;
+            keyUpdated = true;
+          }
+        });
+        if (keyUpdated) {
+          new import_obsidian.Notice("Frontmatter 'Image:' key updated.");
+        }
+      }
+      // *** END OF BLOCK ***
+
       new import_obsidian.Notice(
         "Image successfully generated and placeholder replaced!",
       );
@@ -542,6 +562,20 @@ var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab {
           .setValue(this.plugin.settings.deleteOnRegenerate)
           .onChange(async (value) => {
             this.plugin.settings.deleteOnRegenerate = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new import_obsidian.Setting(containerEl)
+      .setName("Obsidian TTRPG Community Vault compatibility")
+      .setDesc(
+        "If enabled, the plugin will also update the 'Image:' (or 'image:') key in the note's frontmatter to the new filename.",
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.ttrpgVaultCompatibility)
+          .onChange(async (value) => {
+            this.plugin.settings.ttrpgVaultCompatibility = value;
             await this.plugin.saveSettings();
           }),
       );
