@@ -16,6 +16,7 @@ By default, it is configured to use **OpenAI (DALL-E 3)**.
 * **Confirmation Modal:** Asks for a "Yes/No" confirmation before regenerating an existing image to prevent accidents.
 * **Optional Auto-Delete:** Can be configured to automatically move the old, replaced image to the system trash upon regeneration.
 * **Optional "Smart Sizing":** Reads the dimensions of your placeholder image (e.g., `599x598`) and automatically embeds the new, high-resolution image with the *exact same dimensions* (`![[...|599x598]]`).
+* **TTRPG Vault Compatibility:** Optionally updates the `Image:` (or `image:`) key in the note's frontmatter, replacing it with the new **filename** (e.g., `image.png`).
 * **Configurable Prompt Source:**
     * **Custom Heading:** Define exactly which Markdown heading the plugin should read from (e.g., `#`, `##`).
     * **Custom Heading Text:** Define the heading text to search for (e.g., `Description`, `Appearance`).
@@ -36,7 +37,7 @@ Since this plugin is not on the community store, you must install it manually.
 1.  Navigate to your Obsidian vault's plugin folder: `YourVault/.obsidian/plugins/`.
 2.  Create a new folder named `note-illustrator`.
 3.  Inside this new folder, create two files:
-    * `main.js` (copy V 1.1.0)
+    * `main.js` (copy V 1.2.1)
     * `manifest.json`
 4.  Restart Obsidian.
 5.  Go to **Settings > Community Plugins**.
@@ -73,6 +74,7 @@ These settings define where the plugin looks for the prompt text.
 * **Smart Sizing:** (Default: OFF) If enabled, the plugin will read the placeholder's dimensions (e.g., `|600x600`) and apply them to the new image.
     * **WARNING:** This feature may cause conflicts with other plugins (like `dnd-ui-toolkit`) that also parse the `|` symbol in image links.
 * **Delete on Regenerate:** (Default: OFF) If enabled, regenerating an image will move the old, replaced image file to the system trash.
+* **Obsidian TTRPG Community Vault compatibility:** (Default: OFF) If enabled, the plugin will also update the 'Image:' (or 'image:') key in the note's frontmatter to the new **filename**.
 * **Prompt Prefix (Optional):** Text that is automatically added *before* your description to define the style. (Defaults to 5 rows high).
 
 ## 💡 How to Use
@@ -82,7 +84,7 @@ These settings define where the plugin looks for the prompt text.
     * (Using default settings, this would be: `# Description`)
 3.  Write your description text (e.g., `Fritz is a mountain of muscle...`) directly under this heading.
 4.  Ensure the note *also* contains one of your defined placeholder images (e.g., `![[NPC-Placeholder.jpg]]`).
-5.  Open the Command Palette (`Ctrl+P` or `Cmd+P`).
+5.  Open the Command Palette (`Ctrl+P` or `CmdP`).
 6.  Search for and select the command: **"Generate Image from Description & Replace Placeholder"**.
 7.  Wait a moment. The plugin will generate the image and automatically replace the placeholder link.
 
