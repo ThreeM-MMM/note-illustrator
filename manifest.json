@@ -1,7 +1,7 @@
 {
   "id": "note-illustrator",
   "name": "Note Illustrator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "1.10.3",
   "description": "Generates and replaces images in your notes based on a description heading, using AI.",
   "author": "ThreeM",
