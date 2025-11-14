@@ -24,7 +24,7 @@ var __toCommonJS = (mod) =>
 // main.js
 var main_exports = {};
 __export(main_exports, {
-  default: () => NoteIllustratorPlugin, // Renamed
+  default: () => NoteIllustratorPlugin,
 });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian = require("obsidian");
@@ -32,6 +32,8 @@ var import_obsidian = require("obsidian");
 // Default settings for the plugin
 var DEFAULT_SETTINGS = {
   apiKey: "",
+  apiEndpoint: "https://api.openai.com/v1/images/generations",
+  modelName: "dall-e-3",
   placeholderList: "NPC-Placeholder.jpg\nPlayer-Placeholder.jpg",
   generatedImageFolder: "AI-Generated-Images",
   imageSize: "1024x1024",
@@ -76,7 +78,7 @@ class ConfirmationModal extends import_obsidian.Modal {
   }
 }
 
-var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
+var NoteIllustratorPlugin = class extends import_obsidian.Plugin {
   async onload() {
     await this.loadSettings();
     this.addCommand({
@@ -85,7 +87,7 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
       editorCallback: (editor, view) =>
         this.generateAndReplaceImage(editor, view),
     });
-    this.addSettingTab(new NoteIllustratorSettingTab(this.app, this)); // Renamed
+    this.addSettingTab(new NoteIllustratorSettingTab(this.app, this));
   }
 
   // Helper: Get image dimensions
@@ -102,7 +104,7 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
       };
       img.onerror = () => {
         console.error(
-          "Note Illustrator: Could not load placeholder image to read dimensions.", // Renamed
+          "Note Illustrator: Could not load placeholder image to read dimensions.",
         );
         resolve(null);
       };
@@ -134,9 +136,13 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
 
   async generateAndReplaceImage(editor, view) {
     var _a, _b;
-    if (!this.settings.apiKey) {
+    if (
+      (!this.settings.apiKey &&
+        this.settings.apiEndpoint.includes("openai.com")) ||
+      !this.settings.apiEndpoint
+    ) {
       new import_obsidian.Notice(
-        "OpenAI API Key is missing. Please add it in the plugin settings.",
+        "API Key or Endpoint is missing. Please check plugin settings.",
       );
       return;
     }
@@ -246,19 +252,19 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
     }
 
     new import_obsidian.Notice(
-      `Generating ${dallESize} image with DALL-E 3...`,
+      `Generating ${dallESize} image with model ${this.settings.modelName}...`,
     );
 
     try {
       const response = await (0, import_obsidian.requestUrl)({
-        url: "https://api.openai.com/v1/images/generations",
+        url: this.settings.apiEndpoint,
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.settings.apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "dall-e-3",
+          model: this.settings.modelName,
           prompt: fullPrompt,
           n: 1,
           size: dallESize,
@@ -318,9 +324,9 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
         }
       }
     } catch (error) {
-      console.error("Note Illustrator Error:", error.message); // Renamed
+      console.error("Note Illustrator Error:", error.message);
       new import_obsidian.Notice(
-        `Note Illustrator Error: ${error.message}`, // Renamed
+        `Note Illustrator Error: ${error.message}`,
         15e3,
       );
     }
@@ -379,7 +385,7 @@ var NoteIllustratorPlugin = class extends import_obsidian.Plugin { // Renamed
 };
 
 // Settings Tab
-var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab { // Renamed
+var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -387,7 +393,7 @@ var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Note Illustrator - Settings" }); // Renamed
+    containerEl.createEl("h2", { text: "Note Illustrator - Settings" });
 
     containerEl.createEl("p", {
       text: "Defines the heading to use as the image prompt.",
@@ -426,13 +432,39 @@ var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab {
 
     new import_obsidian.Setting(containerEl)
       .setName("OpenAI API Key")
-      .setDesc("Your API key from OpenAI. Required for DALL-E 3.")
+      .setDesc("Your API key from OpenAI (or compatible service).")
       .addText((text) =>
         text
           .setPlaceholder("sk-...")
           .setValue(this.plugin.settings.apiKey)
           .onChange(async (value) => {
             this.plugin.settings.apiKey = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new import_obsidian.Setting(containerEl)
+      .setName("API Endpoint URL")
+      .setDesc("The URL for the image generation API (OpenAI-compatible).")
+      .addText((text) =>
+        text
+          .setPlaceholder("https://api.openai.com/v1/images/generations")
+          .setValue(this.plugin.settings.apiEndpoint)
+          .onChange(async (value) => {
+            this.plugin.settings.apiEndpoint = value.trim();
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new import_obsidian.Setting(containerEl)
+      .setName("Model Name")
+      .setDesc("The model name to request from the API.")
+      .addText((text) =>
+        text
+          .setPlaceholder("dall-e-3")
+          .setValue(this.plugin.settings.modelName)
+          .onChange(async (value) => {
+            this.plugin.settings.modelName = value.trim();
             await this.plugin.saveSettings();
           }),
       );
@@ -470,8 +502,10 @@ var NoteIllustratorSettingTab = class extends import_obsidian.PluginSettingTab {
       );
 
     new import_obsidian.Setting(containerEl)
-      .setName("Image Size")
-      .setDesc("The DALL-E 3 size to use when 'Smart Sizing' is disabled.")
+      .setName("Image Size (DALL-E 3)")
+      .setDesc(
+        "The DALL-E 3 size to use when 'Smart Sizing' is disabled. Ignored by other models.",
+      )
       .addDropdown((dropdown) =>
         dropdown
           .addOption("1024x1024", "1024x1024 (Square)")
