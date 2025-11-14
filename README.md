@@ -2,11 +2,16 @@
 
 This is a plugin for Obsidian.md designed to help you automatically generate art for your notes. It was originally built for TTRPG Game Masters (GMs) to create images for characters and locations, but it is universally applicable for any note.
 
-The plugin reads the text under a **user-defined heading** (e.g., `# Description`) in your active note, sends it to **OpenAI (DALL-E 3)**, and then automatically replaces a specified placeholder image in that note with the newly generated art.
+The plugin reads the text under a **user-defined heading** (e.g., `# Description`) in your active note, sends it to an **OpenAI-compatible API**, and then automatically replaces a specified placeholder image.
+
+By default, it is configured to use **OpenAI (DALL-E 3)**.
 
 ## 🚀 Features
 
-* **AI Art Generation:** Generates high-quality images directly in your notes using **OpenAI (DALL-E 3)**.
+* **Flexible AI Art Generation:**
+    * Generates images using **DALL-E 3** (default) or any other **OpenAI-compatible API**.
+    * **Custom API Endpoint:** Define your own API URL to use compatible services.
+    * **Custom Model Name:** Specify the exact model name to be used (e.g., `dall-e-3`).
 * **Regenerate Function:** If no placeholder is found, the plugin automatically finds the *last generated image* and targets it for regeneration.
 * **Confirmation Modal:** Asks for a "Yes/No" confirmation before regenerating an existing image to prevent accidents.
 * **Optional Auto-Delete:** Can be configured to automatically move the old, replaced image to the system trash upon regeneration.
@@ -31,8 +36,8 @@ Since this plugin is not on the community store, you must install it manually.
 1.  Navigate to your Obsidian vault's plugin folder: `YourVault/.obsidian/plugins/`.
 2.  Create a new folder named `note-illustrator`.
 3.  Inside this new folder, create two files:
-    * `main.js` (copy the code from this project)
-    * `manifest.json` (copy the code from this project)
+    * `main.js` (copy V 1.1.0)
+    * `manifest.json`
 4.  Restart Obsidian.
 5.  Go to **Settings > Community Plugins**.
 6.  Turn off "Safe Mode" if it's on.
@@ -57,10 +62,14 @@ These settings define where the plugin looks for the prompt text.
 
 ### API & Image Settings
 
-* **OpenAI API Key:** Your secret key from OpenAI. Required for DALL-E 3. (This is a paid service).
+* **OpenAI API Key:** Your API key from OpenAI (or compatible service).
+* **API Endpoint URL:** The URL for the image generation API.
+    * **Default:** `https://api.openai.com/v1/images/generations`
+* **Model Name:** The model name to request from the API.
+    * **Default:** `dall-e-3`
 * **Placeholder Filenames:** A list of *all* filenames to be detected as placeholders. **Put each filename on a new line.** (Defaults to 5 rows high).
 * **Generated Image Folder:** The folder where new images will be saved (it will be created automatically).
-* **Image Size:** The DALL-E 3 size to use when "Smart Sizing" is **disabled**.
+* **Image Size (DALL-E 3):** The DALL-E 3 size to use when "Smart Sizing" is **disabled**. (Ignored by other models).
 * **Smart Sizing:** (Default: OFF) If enabled, the plugin will read the placeholder's dimensions (e.g., `|600x600`) and apply them to the new image.
     * **WARNING:** This feature may cause conflicts with other plugins (like `dnd-ui-toolkit`) that also parse the `|` symbol in image links.
 * **Delete on Regenerate:** (Default: OFF) If enabled, regenerating an image will move the old, replaced image file to the system trash.
