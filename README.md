@@ -32,8 +32,6 @@ By default, it is configured to use **OpenAI (DALL-E 3)**.
 
 ## 🔧 Manual Installation
 
-Since this plugin is not on the community store, you must install it manually.
-
 1.  Navigate to your Obsidian vault's plugin folder: `YourVault/.obsidian/plugins/`.
 2.  Create a new folder named `note-illustrator`.
 3.  Inside this new folder, create two files:
